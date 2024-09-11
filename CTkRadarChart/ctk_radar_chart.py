@@ -139,7 +139,7 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
             angle = 2 * math.pi * i / self.num_axes
             x = (
                 self.center[0]
-                + (self.radius + 4) * math.cos(angle)
+                + (self.radius + 3) * math.cos(angle)
                 + math.cos(angle) * ((self.font or font.nametofont("TkDefaultFont")).measure(label) / 2)
             )
             y = self.center[1] + (self.radius + 10) * math.sin(angle)
