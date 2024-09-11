@@ -4,6 +4,7 @@ Author: Akash Bora (Akascape)
 """
 
 import tkinter as tk
+from tkinter import font
 import math
 from typing import Union, Tuple, Optional, Any
 import random
@@ -136,7 +137,11 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
         # Draw labels at each corner
         for i, label in enumerate(self.labels[: self.num_axes]):
             angle = 2 * math.pi * i / self.num_axes
-            x = self.center[0] + (self.radius + 10) * math.cos(angle)
+            x = (
+                self.center[0]
+                + (self.radius + 4) * math.cos(angle)
+                + math.cos(angle) * ((self.font or font.nametofont("TkDefaultFont")).measure(label) / 2)
+            )
             y = self.center[1] + (self.radius + 10) * math.sin(angle)
             self.create_text(
                 x,
