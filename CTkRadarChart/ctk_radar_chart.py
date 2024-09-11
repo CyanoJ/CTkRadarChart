@@ -4,7 +4,7 @@ Author: Akash Bora (Akascape)
 """
 
 import tkinter as tk
-from tkinter import font
+from tkinter import font as font_
 import math
 from typing import Union, Tuple, Optional, Any
 import random
@@ -25,6 +25,7 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
         border_width: int = 2,
         padding: int = 30,
         labels: list = [],
+        title: Optional[str] = None,
         font: Optional[Union[tuple, customtkinter.CTkFont]] = None,
         bg_color: Union[str, Tuple[str, str]] = "transparent",
         fg_color: Optional[Union[str, Tuple[str, str]]] = None,
@@ -40,6 +41,8 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
 
         self.radius = self._apply_widget_scaling(radius)
         self.font = font
+        self.title_font = (self.font or font_.nametofont("TkDefaultFont")).copy()
+        self.title_font.config(size=int(self.title_font.cget("size") * 1.5), weight="bold")
         self.border_width = self._apply_widget_scaling(border_width)
 
         self.fg_color = (
@@ -61,8 +64,8 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
             master,
             bg=self.master._apply_appearance_mode(self.bg_color),
             highlightthickness=0,
-            width=self.radius,
-            height=self.radius,
+            width=self.radius + 40 + self.title_font.metrics("linespace"),
+            height=self.radius + 40 + self.title_font.metrics("linespace"),
             borderwidth=0,
             **kwargs
         )
@@ -73,6 +76,7 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
         self.tags = []
 
         self.labels = labels if labels is not None else [""] * num_axes
+        self.title = title or ""
 
         self.padding = padding  # Padding from the left side
         self.center = (self.radius + self.padding, self.radius + self.padding)
@@ -91,6 +95,7 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
         for dataset, color, fill in zip(self.data, self.colors, self.fills):
             self.draw_dataset(dataset, color, fill)
         self.draw_labels()
+        self.draw_title()
 
     def draw_background(self):
         # Draw the axes and background lines
@@ -133,6 +138,18 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
             data_points, outline=outline_color, fill=fill_color, stipple="gray12", width=self.border_width
         )
 
+    def draw_title(self):
+        x = self.center[0]
+        y = self.center[1] - (self.radius + 10) - (self.font or font_.nametofont("TkDefaultFont")).metrics("linespace")
+        self.create_text(
+            x,
+            y,
+            text=self.title,
+            font=self.title_font,
+            anchor="center",
+            fill=self.master._apply_appearance_mode(self.text_color),
+        )
+
     def draw_labels(self):
         # Draw labels at each corner
         for i, label in enumerate(self.labels[: self.num_axes]):
@@ -140,7 +157,7 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
             x = (
                 self.center[0]
                 + (self.radius + 3) * math.cos(angle)
-                + math.cos(angle) * ((self.font or font.nametofont("TkDefaultFont")).measure(label) / 2)
+                + math.cos(angle) * ((self.font or font_.nametofont("TkDefaultFont")).measure(label) / 2)
             )
             y = self.center[1] + (self.radius + 10) * math.sin(angle)
             self.create_text(
