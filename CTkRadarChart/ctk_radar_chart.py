@@ -64,8 +64,8 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
             master,
             bg=self.master._apply_appearance_mode(self.bg_color),
             highlightthickness=0,
-            width=self.radius + 40 + self.title_font.metrics("linespace"),
-            height=self.radius + 40 + self.title_font.metrics("linespace"),
+            width=self.radius + ((40 + self.title_font.metrics("linespace")) if title else 0),
+            height=self.radius + ((40 + self.title_font.metrics("linespace")) if title else 0),
             borderwidth=0,
             **kwargs
         )
@@ -140,7 +140,12 @@ class CTkRadarChart(tk.Canvas, CTkAppearanceModeBaseClass, CTkScalingBaseClass):
 
     def draw_title(self):
         x = self.center[0]
-        y = self.center[1] - (self.radius + 10) - (self.font or font_.nametofont("TkDefaultFont")).metrics("linespace")
+        y = (
+            self.title_font.metrics("linespace")
+            - (self.font or font_.nametofont("TkDefaultFont")).metrics("linespace")
+            + 1
+        )
+
         self.create_text(
             x,
             y,
